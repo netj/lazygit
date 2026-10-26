@@ -92,6 +92,7 @@ var tests = []*components.IntegrationTest{
 	branch.SquashMerge,
 	branch.Suggestions,
 	branch.UnsetUpstream,
+	branch.ViewBranchDiff,
 	cherry_pick.CherryPick,
 	cherry_pick.CherryPickAcrossWorktrees,
 	cherry_pick.CherryPickCommitThatBecomesEmpty,
