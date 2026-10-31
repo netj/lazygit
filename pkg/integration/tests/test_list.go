@@ -94,6 +94,7 @@ var tests = []*components.IntegrationTest{
 	branch.UnsetUpstream,
 	branch.ViewBranchDiff,
 	branch.ViewRemoteBranchDiff,
+	branch.ViewStackedBranchDiff,
 	cherry_pick.CherryPick,
 	cherry_pick.CherryPickAcrossWorktrees,
 	cherry_pick.CherryPickCommitThatBecomesEmpty,
