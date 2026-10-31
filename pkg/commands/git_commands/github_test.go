@@ -101,6 +101,8 @@ func TestParsePullRequestsResponse(t *testing.T) {
             "node": {
               "title": "Add feature",
               "headRefName": "feature",
+              "headRefOid": "1234567890abcdef1234567890abcdef12345678",
+              "baseRefName": "main",
               "number": 42,
               "url": "https://github.com/jesseduffield/lazygit/pull/42",
               "headRepositoryOwner": {"login": "contributor"},
@@ -141,6 +143,8 @@ func TestParsePullRequestsResponse(t *testing.T) {
 		assert.ElementsMatch(t, []*models.GithubPullRequest{
 			{
 				HeadRefName:         "feature",
+				HeadRefOid:          "1234567890abcdef1234567890abcdef12345678",
+				BaseRefName:         "main",
 				Number:              42,
 				Title:               "Add feature",
 				State:               "OPEN",

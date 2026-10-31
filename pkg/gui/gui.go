@@ -679,6 +679,8 @@ func (gui *Gui) loadCachedPullRequests() []*models.GithubPullRequest {
 	return lo.Map(cachedPRs, func(cached config.CachedPullRequest, _ int) *models.GithubPullRequest {
 		return &models.GithubPullRequest{
 			HeadRefName: cached.HeadRefName,
+			HeadRefOid:  cached.HeadRefOid,
+			BaseRefName: cached.BaseRefName,
 			Number:      cached.Number,
 			Title:       cached.Title,
 			State:       cached.State,

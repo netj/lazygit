@@ -13,6 +13,8 @@ const githubPullRequestsCacheFileName = "github_pull_requests.json"
 // CachedPullRequest stores the essential fields of a GitHub pull request.
 type CachedPullRequest struct {
 	HeadRefName         string `json:"headRefName"`
+	HeadRefOid          string `json:"headRefOid,omitempty"`
+	BaseRefName         string `json:"baseRefName,omitempty"`
 	Number              int    `json:"number"`
 	Title               string `json:"title"`
 	State               string `json:"state"`

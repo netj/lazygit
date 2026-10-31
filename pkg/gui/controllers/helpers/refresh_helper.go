@@ -1925,6 +1925,8 @@ func (self *RefreshHelper) savePullRequestsToCache(prs []*models.GithubPullReque
 	cached := lo.Map(prs, func(pr *models.GithubPullRequest, _ int) config.CachedPullRequest {
 		return config.CachedPullRequest{
 			HeadRefName:         pr.HeadRefName,
+			HeadRefOid:          pr.HeadRefOid,
+			BaseRefName:         pr.BaseRefName,
 			Number:              pr.Number,
 			Title:               pr.Title,
 			State:               pr.State,

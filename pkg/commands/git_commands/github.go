@@ -83,6 +83,8 @@ type PullRequestEdge struct {
 type PullRequestNode struct {
 	Title               string                `json:"title"`
 	HeadRefName         string                `json:"headRefName"`
+	HeadRefOid          string                `json:"headRefOid"`
+	BaseRefName         string                `json:"baseRefName"`
 	Number              int                   `json:"number"`
 	Url                 string                `json:"url"`
 	HeadRepositoryOwner GithubRepositoryOwner `json:"headRepositoryOwner"`
@@ -133,6 +135,8 @@ func fetchPullRequestsQuery(branches []string, owner string, repo string) (strin
         node {
           title
           headRefName
+          headRefOid
+          baseRefName
           state
           number
           url
@@ -313,6 +317,8 @@ func parsePullRequestsResponse(respBytes []byte) ([]*models.GithubPullRequest, e
 			node := edge.Node
 			pr := &models.GithubPullRequest{
 				HeadRefName: node.HeadRefName,
+				HeadRefOid:  node.HeadRefOid,
+				BaseRefName: node.BaseRefName,
 				Number:      node.Number,
 				Title:       node.Title,
 				State:       lo.Ternary(node.IsDraft && node.State != "CLOSED", "DRAFT", node.State),
