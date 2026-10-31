@@ -595,6 +595,9 @@ func (self *MainViewController) openPullRequestDisabledReason() *types.DisabledR
 	if reason := self.c.Helpers().Host.NoPullRequestDisabledReason(diff.Branch); reason != nil {
 		return reason
 	}
+	if diff.MismatchReason != "" {
+		return &types.DisabledReason{Text: diff.MismatchReason}
+	}
 	return self.commitsOutsidePullRequestDisabledReason(diff.Commits)
 }
 
@@ -1104,7 +1107,7 @@ func (self *MainViewController) openPullRequestAtSelectedLine() error {
 		return errors.New(self.c.Tr.NoPullRequestForBranch)
 	}
 
-	if len(diff.Commits) == 0 {
+	if len(diff.Commits) == 0 && !diff.WholePullRequest {
 		return nil
 	}
 
@@ -1119,7 +1122,11 @@ func (self *MainViewController) openPullRequestAtSelectedLine() error {
 	}
 
 	self.c.LogAction(self.c.Tr.Actions.OpenPullRequest)
-	url := githubPullRequestLineURL(pr.Url, githubCommitRange(diff.Commits, diff.BaseHash), relativePath, info)
+	commitRange := ""
+	if !diff.WholePullRequest {
+		commitRange = githubCommitRange(diff.Commits, diff.BaseHash)
+	}
+	url := githubPullRequestLineURL(pr.Url, commitRange, relativePath, info)
 	return self.c.OS().OpenLink(url)
 }
 
@@ -1136,7 +1143,7 @@ func (self *MainViewController) pullRequestDiff() types.PullRequestDiff {
 }
 
 // githubPullRequestLineURL builds the URL of a line of a file, in the diff a pull request
-// shows for the given commits. The file is named by the SHA-256 of its path as git spells
+// shows for the given commits, or in its whole diff where commitRange is "". The file is named by the SHA-256 of its path as git spells
 // it, and the line by which side of the diff it is on.
 //
 // GitHub documents none of this; the form was read off the URLs its own pages carry (see
@@ -1146,6 +1153,9 @@ func githubPullRequestLineURL(
 ) string {
 	pathHash := sha256.Sum256([]byte(relativePath))
 	anchor := "diff-" + hex.EncodeToString(pathHash[:]) + githubDiffLineSuffix(info)
+	if commitRange == "" {
+		return fmt.Sprintf("%s/changes#%s", prURL, anchor)
+	}
 	return fmt.Sprintf("%s/changes/%s#%s", prURL, commitRange, anchor)
 }
 

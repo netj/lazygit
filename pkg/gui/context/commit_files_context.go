@@ -9,6 +9,8 @@ import (
 	"github.com/jesseduffield/lazygit/pkg/gui/presentation/icons"
 	"github.com/jesseduffield/lazygit/pkg/gui/style"
 	"github.com/jesseduffield/lazygit/pkg/gui/types"
+	"github.com/jesseduffield/lazygit/pkg/i18n"
+	"github.com/jesseduffield/lazygit/pkg/utils"
 	"github.com/samber/lo"
 )
 
@@ -31,10 +33,14 @@ func (self *CommitFilesContext) GetDiffMainViewType() types.DiffMainViewType {
 	return types.DiffMainViewTypePatchBuilding
 }
 
-// PullRequestDiff asks the panel this one was entered from. The files listed here are
+// PullRequestDiff is the whole diff of the pull request of a branch diff's branch. For
+// other diffs it asks the panel this one was entered from: the files listed here are
 // those of the commits selected there, and that panel knows which branch's pull request
 // those commits are in.
 func (self *CommitFilesContext) PullRequestDiff() types.PullRequestDiff {
+	if branchDiff, ok := self.GetRef().(*models.BranchDiff); ok {
+		return branchDiffPullRequestDiff(branchDiff, self.c.Model().PullRequestsMap, self.c.Tr)
+	}
 	if parent, ok := self.GetParentContext().(types.PullRequestDiffContext); ok {
 		return parent.PullRequestDiff()
 	}
@@ -133,4 +139,31 @@ func (self *CommitFilesContext) ReInit(ref models.Ref, refRange *types.RefRange)
 		self.SetTitleRef(ref.Description())
 	}
 	self.GetView().Title = self.Title()
+}
+
+// branchDiffPullRequestDiff matches a branch diff up with the pull request of its
+// branch. The two show the same diff where the pull request is opened against the
+// branch the diff starts from, and is at the commit the diff ends at.
+func branchDiffPullRequestDiff(
+	branchDiff *models.BranchDiff,
+	pullRequests map[string]*models.GithubPullRequest,
+	tr *i18n.TranslationSet,
+) types.PullRequestDiff {
+	branch, ok := branchDiff.Branch.(*models.Branch)
+	if !ok {
+		return types.PullRequestDiff{}
+	}
+
+	diff := types.PullRequestDiff{Branch: branch.Name, WholePullRequest: true}
+	pr, ok := pullRequests[branch.Name]
+	if !ok {
+		return diff
+	}
+	if pr.BaseRefName != branchDiff.BaseRefName {
+		diff.MismatchReason = utils.ResolvePlaceholderString(
+			tr.BranchDiffNotAgainstPullRequestBase, map[string]string{"baseBranch": pr.BaseRefName})
+	} else if pr.HeadRefOid != branchDiff.Tip {
+		diff.MismatchReason = tr.BranchDiffNotAtPullRequestHead
+	}
+	return diff
 }

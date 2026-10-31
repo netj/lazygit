@@ -628,6 +628,8 @@ type TranslationSet struct {
 	ViewBranchDiff                        string
 	ViewBranchDiffTooltip                 string
 	ViewBranchDiffSince                   string
+	BranchDiffNotAgainstPullRequestBase   string
+	BranchDiffNotAtPullRequestHead        string
 	CouldNotDetermineBaseBranch           string
 	DivergenceSectionHeaderLocal          string
 	DivergenceSectionHeaderRemote         string
@@ -1848,6 +1850,8 @@ func EnglishTranslationSet() *TranslationSet {
 		ViewDivergenceFromBaseBranch:         "View divergence from base branch ({{.baseBranch}})",
 		ViewBranchDiff:                       "View branch diff",
 		ViewBranchDiffSince:                  "View branch diff since {{.baseBranch}}",
+		BranchDiffNotAgainstPullRequestBase:  "The pull request is opened against {{.baseBranch}}, which this diff doesn't start from",
+		BranchDiffNotAtPullRequestHead:       "The pull request isn't at the commit this diff ends at. Push the branch, or view its diff again",
 		ViewBranchDiffTooltip:                "View the files the selected branch changed since it diverged from its base branch, as a pull request of it would show them. Changes it got by merging in the base branch are left out. A branch stacked on other branches starts from the closest of them instead; the upstream options offer the others too.",
 		CouldNotDetermineBaseBranch:          "Couldn't determine base branch",
 		DivergenceSectionHeaderLocal:         "Local",

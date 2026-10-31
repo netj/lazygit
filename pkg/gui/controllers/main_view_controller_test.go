@@ -75,6 +75,13 @@ func TestGithubPullRequestLineURL(t *testing.T) {
 			assert.Equal(t, s.expected, githubPullRequestLineURL(prURL, commitHash, s.path, s.info))
 		})
 	}
+
+	t.Run("a line in the whole diff of the pull request", func(t *testing.T) {
+		info := types.DiffLineInfo{Type: types.DiffLineAdded, NewLine: 12}
+		assert.Equal(t,
+			prURL+"/changes#diff-"+fileHash+"R12",
+			githubPullRequestLineURL(prURL, "", "dir/file1", info))
+	})
 }
 
 func TestGithubCommitRange(t *testing.T) {

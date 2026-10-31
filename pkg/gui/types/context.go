@@ -251,6 +251,15 @@ type PullRequestDiff struct {
 	// oldest of the commits, where the pull request has that parent as one of its own
 	// commits, and "" where the diff starts where the pull request itself does.
 	BaseHash string
+
+	// WholePullRequest is true where the diff is that of the pull request as a whole,
+	// as its page of changes shows it, rather than that of some of its commits.
+	// Commits is empty then.
+	WholePullRequest bool
+
+	// MismatchReason says why the diff isn't the one the pull request shows, where it
+	// isn't, though it is that of the pull request's branch.
+	MismatchReason string
 }
 
 // BranchDiffContext is implemented by the side panel contexts that show, in their

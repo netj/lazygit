@@ -10,6 +10,10 @@ type BranchDiff struct {
 	// BaseBranch is the short name of the base branch, for display.
 	BaseBranch string
 
+	// BaseRefName is the name of the base branch as a pull request opened against it
+	// names it: on the remote, and without the remote's name.
+	BaseRefName string
+
 	// MergeBase is the hash of the commit the branch diverged from its base branch at.
 	MergeBase string
 

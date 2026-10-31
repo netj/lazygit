@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"errors"
+	"strings"
 
 	"github.com/jesseduffield/lazygit/pkg/commands/models"
 	"github.com/jesseduffield/lazygit/pkg/gui/controllers/helpers"
@@ -20,6 +21,7 @@ type BranchDiffAction struct {
 // on it that the diff starts from.
 type branchDiffBase struct {
 	name      string
+	refName   string
 	mergeBase string
 }
 
@@ -66,10 +68,11 @@ func (self *BranchDiffAction) MenuItems(branch models.Ref, parent types.Context)
 
 func (self *BranchDiffAction) view(branch models.Ref, tip string, base branchDiffBase, parent types.Context) error {
 	ref := &models.BranchDiff{
-		Branch:     branch,
-		BaseBranch: base.name,
-		MergeBase:  base.mergeBase,
-		Tip:        tip,
+		Branch:      branch,
+		BaseBranch:  base.name,
+		BaseRefName: base.refName,
+		MergeBase:   base.mergeBase,
+		Tip:         tip,
 	}
 	return viewCommitFiles(self.c, ref, nil, false, parent)
 }
@@ -87,7 +90,11 @@ func (self *BranchDiffAction) bases(branch models.Ref, tip string) ([]branchDiff
 	if baseBranch == "" || mergeBase == "" {
 		return nil, errors.New(self.c.Tr.CouldNotDetermineBaseBranch)
 	}
-	mainBase := branchDiffBase{name: helpers.ShortBranchName(baseBranch), mergeBase: mergeBase}
+	mainBase := branchDiffBase{
+		name:      helpers.ShortBranchName(baseBranch),
+		refName:   branchNameOnRemote(baseBranch),
+		mergeBase: mergeBase,
+	}
 
 	localBranch, ok := branch.(*models.Branch)
 	if !ok {
@@ -121,8 +128,19 @@ func (self *BranchDiffAction) stackedBases(branch *models.Branch, tip string, me
 	result := []branchDiffBase{}
 	for _, hash := range hashes {
 		for _, other := range branchesByTip[hash] {
-			result = append(result, branchDiffBase{name: other.Name, mergeBase: hash})
+			refName := lo.Ternary(other.IsTrackingRemote(), other.UpstreamBranch, other.Name)
+			result = append(result, branchDiffBase{name: other.Name, refName: refName, mergeBase: hash})
 		}
 	}
 	return result, nil
+}
+
+// branchNameOnRemote returns the name of the branch with the given full ref name, local
+// or remote, as the remote names it.
+func branchNameOnRemote(fullRefName string) string {
+	if name, ok := strings.CutPrefix(fullRefName, "refs/remotes/"); ok {
+		_, name, _ = strings.Cut(name, "/")
+		return name
+	}
+	return strings.TrimPrefix(fullRefName, "refs/heads/")
 }
