@@ -93,6 +93,7 @@ var tests = []*components.IntegrationTest{
 	branch.Suggestions,
 	branch.UnsetUpstream,
 	branch.ViewBranchDiff,
+	branch.ViewBranchDiffFromCommits,
 	branch.ViewRemoteBranchDiff,
 	branch.ViewStackedBranchDiff,
 	cherry_pick.CherryPick,
